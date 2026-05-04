@@ -114,4 +114,38 @@ WBITT Network MultiTool (with NGINX) - dep-app-76cd889cd4-gtwtr - 10.1.69.204 - 
   
 ### Задание 2: Настройка Ingress ###  
   
-
+1. Создал манифесты для развертывания [frontend](task2/deployment-frontend.yml) и [backend](task2/deployment-backend.yml)  
+```
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl apply -f deployment-frontend.yml -n dep-ns
+deployment.apps/dep-front created
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl apply -f deployment-backend.yml -n dep-ns
+deployment.apps/dep-back created
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl get pods -o wide -n dep-ns
+NAME                         READY   STATUS    RESTARTS   AGE    IP            NODE        NOMINATED NODE   READINESS GATES
+dep-app-76cd889cd4-gtwtr     2/2     Running   0          159m   10.1.69.204   uxtu-note   <none>           <none>
+dep-app-76cd889cd4-m66jg     2/2     Running   0          156m   10.1.69.208   uxtu-note   <none>           <none>
+dep-app-76cd889cd4-mt6nc     2/2     Running   0          48m    10.1.69.223   uxtu-note   <none>           <none>
+dep-back-5df4764697-g8z5l    1/1     Running   0          71s    10.1.69.237   uxtu-note   <none>           <none>
+dep-back-5df4764697-njmlw    1/1     Running   0          71s    10.1.69.236   uxtu-note   <none>           <none>
+dep-front-644c7d7796-cv7t6   1/1     Running   0          81s    10.1.69.233   uxtu-note   <none>           <none>
+dep-front-644c7d7796-zl727   1/1     Running   0          81s    10.1.69.231   uxtu-note   <none>           <none>
+dep2-app-8664778d65-2frz6    1/1     Running   0          81m    10.1.69.224   uxtu-note   <none>           <none>
+multitool-pod                1/1     Running   0          135m   10.1.69.229   uxtu-note   <none>           <none>
+```  
+  
+2. Создал манифесты для сервисов [frontend](task2/service-frontend.yml) и [backend](task2/service-backend.yml)  
+```
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl apply -f service-frontend.yml -n dep-ns
+service/front-service created
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl apply -f service-backend.yml -n dep-ns
+service/back-service created
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl get svc -n dep-ns -o wide
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                       AGE    SELECTOR
+back-service     ClusterIP   10.152.183.54    <none>        9001/TCP                      23s    app=dep-back
+dep-service      ClusterIP   10.152.183.221   <none>        9001/TCP,9002/TCP             149m   app=dep-app
+dep-service-np   NodePort    10.152.183.105   <none>        80:30101/TCP,8080:30102/TCP   29m    app=dep-app
+dep2-service     ClusterIP   10.152.183.36    <none>        10082/TCP                     83m    app=dep2-app
+front-service    ClusterIP   10.152.183.250   <none>        9001/TCP                      31s    app=dep-front
+```  
+  
+3. 

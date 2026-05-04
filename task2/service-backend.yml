@@ -1,16 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dep-service
+  name: back-service
 spec:
   selector:
-    app: dep-app
+    app: dep-back
   ports:
-    - name: nginx-port
-      protocol: TCP
-      port: 9001
-      targetPort: 80
     - name: multitool-port
       protocol: TCP
-      port: 9002
+      port: 9001
       targetPort: 8080
