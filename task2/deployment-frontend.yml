@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-front
+  labels:
+    app: dep-front
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dep-front
+  template:
+    metadata:
+      labels:
+        app: dep-front
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
