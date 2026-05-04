@@ -148,4 +148,118 @@ dep2-service     ClusterIP   10.152.183.36    <none>        10082/TCP           
 front-service    ClusterIP   10.152.183.250   <none>        9001/TCP                      31s    app=dep-front
 ```  
   
-3. 
+3. Включил ingress controller  для Microk8s  
+```
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$  microk8s enable ingress
+Infer repository core for addon ingress
+Enabling Ingress
+ingressclass.networking.k8s.io/public created
+ingressclass.networking.k8s.io/nginx created
+namespace/ingress created
+serviceaccount/nginx-ingress-microk8s-serviceaccount created
+clusterrole.rbac.authorization.k8s.io/nginx-ingress-microk8s-clusterrole created
+role.rbac.authorization.k8s.io/nginx-ingress-microk8s-role created
+clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-microk8s created
+rolebinding.rbac.authorization.k8s.io/nginx-ingress-microk8s created
+configmap/nginx-load-balancer-microk8s-conf created
+configmap/nginx-ingress-tcp-microk8s-conf created
+configmap/nginx-ingress-udp-microk8s-conf created
+daemonset.apps/nginx-ingress-microk8s-controller created
+Ingress is enabled
+```  
+  
+4. Создал и применил [ingress для маршрутизации запросов на frontend и backend](task2/ingress.yml)  
+```  
+lex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl apply -f ingress.yml -n dep-ns
+ingress.networking.k8s.io/back-front-ingress created
+alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl describe ingress -n dep-ns
+Name:             back-front-ingress
+Labels:           <none>
+Namespace:        dep-ns
+Address:          127.0.0.1
+Ingress Class:    public
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /      front-service:9001 (10.1.69.231:80,10.1.69.233:80)
+              /api   back-service:9001 (10.1.69.236:8080,10.1.69.237:8080)
+Annotations:  <none>
+Events:
+  Type    Reason  Age                 From                      Message
+  ----    ------  ----                ----                      -------
+  Normal  Sync    94s (x2 over 2m9s)  nginx-ingress-controller  Scheduled for sync
+  alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl describe svc back-service -ndep-ns
+  Name:                     back-service
+  Namespace:                dep-ns
+  Labels:                   <none>
+  Annotations:              <none>
+  Selector:                 app=dep-back
+  Type:                     ClusterIP
+  IP Family Policy:         SingleStack
+  IP Families:              IPv4
+  IP:                       10.152.183.54
+  IPs:                      10.152.183.54
+  Port:                     multitool-port  9001/TCP
+  TargetPort:               8080/TCP
+  Endpoints:                10.1.69.236:8080,10.1.69.237:8080
+  Session Affinity:         None
+  Internal Traffic Policy:  Cluster
+  Events:                   <none>
+  alex@uxtu-note:~/Study/kuber4/kuber4/task2$ kubectl describe svc front-service -ndep-ns
+  Name:                     front-service
+  Namespace:                dep-ns
+  Labels:                   <none>
+  Annotations:              <none>
+  Selector:                 app=dep-front
+  Type:                     ClusterIP
+  IP Family Policy:         SingleStack
+  IP Families:              IPv4
+  IP:                       10.152.183.250
+  IPs:                      10.152.183.250
+  Port:                     nginx-port  9001/TCP
+  TargetPort:               80/TCP
+  Endpoints:                10.1.69.231:80,10.1.69.233:80
+  Session Affinity:         None
+  Internal Traffic Policy:  Cluster
+  Events:                   <none>
+  alex@uxtu-note:~/Study/kuber4/kuber4/task2$ curl localhost/
+  <!DOCTYPE html>
+  <html>
+  <head>
+  <title>Welcome to nginx!</title>
+  <style>
+  html { color-scheme: light dark; }
+  body { width: 35em; margin: 0 auto;
+  font-family: Tahoma, Verdana, Arial, sans-serif; }
+  </style>
+  </head>
+  <body>
+  <h1>Welcome to nginx!</h1>
+  <p>If you see this page, nginx is successfully installed and working.
+  Further configuration is required for the web server, reverse proxy, 
+  API gateway, load balancer, content cache, or other features.</p>
+  
+  <p>For online documentation and support please refer to
+  <a href="https://nginx.org/">nginx.org</a>.<br/>
+  To engage with the community please visit
+  <a href="https://community.nginx.org/">community.nginx.org</a>.<br/>
+  For enterprise grade support, professional services, additional 
+  security features and capabilities please refer to
+  <a href="https://f5.com/nginx">f5.com/nginx</a>.</p>
+  
+  <p><em>Thank you for using nginx.</em></p>
+  </body>
+  </html>
+  alex@uxtu-note:~/Study/kuber4/kuber4/task2$ curl localhost/api
+  <html>
+  <head><title>404 Not Found</title></head>
+  <body>
+  <center><h1>404 Not Found</h1></center>
+  <hr><center>nginx/1.28.0</center>
+  </body>
+  </html>
+```  
+  
+  
