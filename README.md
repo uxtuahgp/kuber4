@@ -1,4 +1,6 @@
-## Задание 1 - Настройка Service (ClusterIP и NodePort)
+## Домашнее задание по теме Сетевое взаимодействие в Kubernetes ##  
+  
+### Задание 1 - Настройка Service (ClusterIP и NodePort) ###  
 
 1. Создан и применен [манифест развертывания двух контейнеров](deployment.yml).  
 ```
@@ -67,5 +69,49 @@ test-pod:/# curl dep-service:9002
 WBITT Network MultiTool (with NGINX) - dep-app-76cd889cd4-gtwtr - 10.1.69.204 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
 
 ```  
+  
+4. Создал [манифест сервиса типа NodePort](service-nodeport.yml) для публикации сервисов подов на внешних интерфейсах узлов K8s  
+5. Проверил доступность сервисов с локального компьютера:  
+```
+alex@uxtu-note:~/Study/kuber4/kuber4$ kubectl apply -f service-nodeport.yml -n dep-ns
+service/dep-service-np created
+alex@uxtu-note:~/Study/kuber4/kuber4$ kubectl get svc -o wide -n dep-ns
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                       AGE    SELECTOR
+dep-service      ClusterIP   10.152.183.221   <none>        9001/TCP,9002/TCP             120m   app=dep-app
+dep-service-np   NodePort    10.152.183.105   <none>        80:30101/TCP,8080:30102/TCP   22s    app=dep-app
+dep2-service     ClusterIP   10.152.183.36    <none>        10082/TCP                     54m    app=dep2-app
+alex@uxtu-note:~/Study/kuber4/kuber4$ curl localhost:30101
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, nginx is successfully installed and working.
+Further configuration is required for the web server, reverse proxy, 
+API gateway, load balancer, content cache, or other features.</p>
+
+<p>For online documentation and support please refer to
+<a href="https://nginx.org/">nginx.org</a>.<br/>
+To engage with the community please visit
+<a href="https://community.nginx.org/">community.nginx.org</a>.<br/>
+For enterprise grade support, professional services, additional 
+security features and capabilities please refer to
+<a href="https://f5.com/nginx">f5.com/nginx</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+alex@uxtu-note:~/Study/kuber4/kuber4$ curl localhost:30102
+WBITT Network MultiTool (with NGINX) - dep-app-76cd889cd4-gtwtr - 10.1.69.204 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
+```  
+  
+### Задание 2: Настройка Ingress ###  
   
 

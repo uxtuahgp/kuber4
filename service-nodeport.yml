@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dep-service-np
+spec:
+  type: NodePort
+  selector:
+    app: dep-app
+  ports:
+    - name: nginx-port
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30101
+    - name: multitool-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30102
